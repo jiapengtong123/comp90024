@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Add a GeoJSON polygon</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet"/>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        h2,
+        h3 {
+            margin: 10px;
+            font-size: 1.2em;
+        }
+
+        h3 {
+            font-size: 1em;
+        }
+
+        p {
+            font-size: 0.85em;
+            margin: 10px;
+            text-align: left;
+        }
+
+        /**
+        * Create a position for the map
+        * on the page */
+        #map {
+            position: absolute;
+            top: 50px;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /**
+        * Set rules for how the map overlays
+        * (information box and legend) will be displayed
+        * on the page. */
+        .map-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.8);
+            margin-right: 20px;
+            font-family: Arial, sans-serif;
+            overflow: auto;
+            border-radius: 3px;
+        }
+
+        #features {
+            top: 50px;
+            height: 200px;
+            margin-top: 20px;
+            width: 250px;
+        }
+
+        #legend {
+            padding: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            line-height: 18px;
+            height: 150px;
+            margin-bottom: 40px;
+            width: 100px;
+        }
+
+        .legend-key {
+            display: inline-block;
+            border-radius: 20%;
+            width: 10px;
+            height: 10px;
+            margin-right: 5px;
+        }
+
+        .container {
+            height: 50px;
+            width: 100%;
+            background-color: #f1f1f1;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+<form style="padding: 15px">
+    <label for="datasets">Choose a dataset</label>
+    <select name="datasets" id="datasets" onchange="selectDataset(this.value)">
+        <option value="data">dataset</option>
+        <option value="data1">dataset1</option>
+    </select>
+</form>
+</div>
+<div id='map'></div>
+<div class='map-overlay' id='features'><h2>Dataset name</h2><div id='pd'><p>Hover over an area!</p></div></div>
+<div class='map-overlay' id='legend'></div>
+<script>
+  // color mapping function
+  function perc2color(perc) {
+    let r, g, b = 0;
+    if(perc < 50) {
+      r = 255;
+      g = Math.round(5.1 * perc);
+    }
+    else {
+      g = 255;
+      r = Math.round(510 - 5.10 * perc);
+    }
+    let h = r * 0x10000 + g * 0x100 + b * 0x1;
+    return '#' + ('000000' + h.toString(16)).slice(-6);
+  }
+</script>
+<script>
+  // change data sets
+  function selectDataset(name) {
+    switch (name) {
+      case 'data':
+        requestDataset('data.json');
+        break;
+      case 'data1':
+        requestDataset('data1.json');
+        break;
+    }
+  }
+
+  function requestDataset(name) {
+    let httpRequest;
+    (function makeRequest() {
+      httpRequest = new XMLHttpRequest();
+      if (!httpRequest) {
+        return false;
+      }
+      httpRequest.onreadystatechange = handleData;
+      httpRequest.open('GET', 'data/' + name, true);
+      httpRequest.send();
+    })();
+
+    function handleData() {
+      if (httpRequest.readyState === XMLHttpRequest.DONE) {
+        if (httpRequest.status === 200) {
+
+          data = JSON.parse(httpRequest.responseText);
+          data['features'].map((e)=>{e['properties']['color'] = perc2color(e['properties']['rank']/51481 * 100)});
+          map.getSource('test').setData(data);
+        } else {
+          console.log('ERROR' + httpRequest);
+        }
+      }
+    }
+  }
+</script>
+<script>
+  // get data
+  let dataset_name = 'data';
+  let data = null;
+  selectDataset(dataset_name);
+
+  // TO MAKE THE MAP APPEAR YOU MUST
+  // ADD YOUR ACCESS TOKEN FROM
+  // https://account.mapbox.com
+  mapboxgl.accessToken = 'pk.eyJ1IjoiamlhcGVuZ3RvbmciLCJhIjoiY2thZGJ5eGZjMjNoMDJycXZyMXluNWd6aiJ9.7JMI-kKER5hU2Pe59Ro-7w';
+  let map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [133.7751, -25.2744],
+    zoom: 3.5
+  });
+
+  let hoveredStateId = null;
+  map.on('load', function () {
+    // make a pointer cursor
+    // map.getCanvas().style.cursor = 'default';
+    let layers = ['0-10', '10-20', '20-50', '50-100', '100-200', '200-500', '500-1000', '1000+'];
+    let colors = ['#FFEDA0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'];
+
+    data['features'].map((e, i)=>{e['properties']['color'] = perc2color(e['properties']['rank']/51481 * 100)});
+    map.addSource("test", {
+      'type': 'geojson',
+      'data': data,
+      generateId: true,
+    });
+
+    map.addLayer({
+      'id': 'data_demo',
+      'type': 'fill',
+      'source': 'test',
+      'layout': {},
+      'paint': {
+        'fill-color': ['get', 'color'],
+        'fill-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          1, 0.5]
+      }
+    });
+
+    map.addLayer({
+      'id': 'borders',
+      'type': 'line',
+      'source': 'test',
+      'layout': {},
+      'paint': {
+        'line-color': '#627BC1',
+        'line-width': 1,
+      }
+    });
+
+    for (i = 0; i < layers.length; i++) {
+      let layer = layers[i];
+      let color = colors[i];
+      let item = document.createElement('div');
+      let key = document.createElement('span');
+
+      key.className = 'legend-key';
+      key.style.backgroundColor = color;
+
+      let value = document.createElement('span');
+      value.innerHTML = layer;
+      item.appendChild(key);
+      item.appendChild(value);
+      legend.appendChild(item);
+    }
+
+    map.on('mousemove', function(e) {
+      let areas = map.queryRenderedFeatures(e.point, {
+        layers: ['data_demo']
+      });
+
+      if (areas.length > 0) {
+        document.getElementById('pd').innerHTML = '<h3><strong>' + areas[0].properties.rank + '</strong></h3><p><strong><em>' + areas[0].properties.rank + '</strong></em></p>';
+      } else {
+        document.getElementById('pd').innerHTML = '<p>Hover over an area!</p>';
+      }
+
+      if (areas.length > 0) {
+        if (hoveredStateId) {
+          map.setFeatureState(
+              { source: 'test', id: hoveredStateId },
+              { hover: false }
+          );
+        }
+        hoveredStateId = areas[0].id;
+        map.setFeatureState(
+            { source: 'test', id: hoveredStateId },
+            { hover: true }
+        );
+      }
+    });
+
+    // When the mouse leaves the state-fill layer, update the feature state of the
+    // previously hovered feature.
+    map.on('mouseleave', 'data_demo', function() {
+      if (hoveredStateId) {
+        map.setFeatureState(
+            { source: 'test', id: hoveredStateId },
+            { hover: false }
+        );
+      }
+      hoveredStateId = null;
+    });
+  });
+</script>
+
+
+</body>
+</html>
