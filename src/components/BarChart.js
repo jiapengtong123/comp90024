@@ -10,7 +10,8 @@ export default class BarChart extends Component {
       datasets: [{
         label: 'dataset name',
         data: [2000, 3000, 4000],
-        backgroundColor: ['#FF0000', '#0000FF', '#FFFF00'],
+        // backgroundColor: ['#FF0000'],
+        backgroundColor: '#4ca1ff',
         borderWidth: 1
       }]
     }
@@ -26,6 +27,9 @@ export default class BarChart extends Component {
               data={{
                 labels: this.state.labels,
                 datasets: this.state.datasets
+              }}
+              options={{
+                barPercentage: 0.1
               }}
           />
         </div>

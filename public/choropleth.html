@@ -58,15 +58,18 @@
             height: 200px;
             margin-top: 20px;
             width: 250px;
+            display: flex;
+            flex-direction: column;
+            /*overflow: scroll;*/
         }
 
         #legend {
             padding: 10px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             line-height: 18px;
-            height: 150px;
+            height: auto;
             margin-bottom: 40px;
-            width: 100px;
+            width: auto;
         }
 
         .legend-key {
@@ -83,51 +86,90 @@
             background-color: #f1f1f1;
         }
 
+        .marker {
+            background-image: url('./mapbox-icon.png');
+            background-size: cover;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .mapboxgl-popup {
+            max-width: 200px;
+        }
+
+        .mapboxgl-popup-content {
+            text-align: center;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .button {
+            background-color: #0554af; /* Green */
+            border: none;
+            color: white;
+            height: 30px;
+            margin: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
+    <div style="display: flex">
 <form style="padding: 15px">
     <label for="datasets">Choose a dataset</label>
-    <select name="datasets" id="datasets" onchange="selectDataset(this.value)">
-        <option value="data">dataset</option>
+    <select name="datasets" id="datasets" onchange="selectDataset(this.value)" style="font-size: 16px">
         <option value="data1">dataset1</option>
+        <option value="data2">dataset2</option>
+        <option value="data3">dataset3</option>
+        <option value="data4">dataset4</option>
+        <option value="data5">dataset5</option>
     </select>
 </form>
+        <button class="button" id="markers" onclick="requestCoordinates()">show markers</button>
+    </div>
 </div>
 <div id='map'></div>
 <div class='map-overlay' id='features'><h2>Dataset name</h2><div id='pd'><p>Hover over an area!</p></div></div>
 <div class='map-overlay' id='legend'></div>
 <script>
-  // color mapping function
-  function perc2color(perc) {
-    let r, g, b = 0;
-    if(perc < 50) {
-      r = 255;
-      g = Math.round(5.1 * perc);
-    }
-    else {
-      g = 255;
-      r = Math.round(510 - 5.10 * perc);
-    }
-    let h = r * 0x10000 + g * 0x100 + b * 0x1;
-    return '#' + ('000000' + h.toString(16)).slice(-6);
-  }
-</script>
-<script>
   // change data sets
   function selectDataset(name) {
+    // set which property to show
+    setDataProperty(name);
+    // set the layer and colors for the label
+    setLayersAndColors(name);
+    // load a different data file
+    loadDataFile(name);
+  }
+
+  function loadDataFile(name) {
+    dataset_name = name;
     switch (name) {
-      case 'data':
-        requestDataset('data.json');
-        break;
       case 'data1':
         requestDataset('data1.json');
+        break;
+      case 'data2':
+        requestDataset('data2.json');
+        break;
+      case 'data3':
+        requestDataset('data3.json');
+        break;
+      case 'data4':
+        requestDataset('data4.json');
+        break;
+      case 'data5':
+        requestDataset('data5.json');
         break;
     }
   }
 
-  function requestDataset(name) {
+  function requestDataset(filename) {
     let httpRequest;
     (function makeRequest() {
       httpRequest = new XMLHttpRequest();
@@ -135,16 +177,15 @@
         return false;
       }
       httpRequest.onreadystatechange = handleData;
-      httpRequest.open('GET', 'data/' + name, true);
+      httpRequest.open('GET', 'data/' + filename, true);
       httpRequest.send();
     })();
 
     function handleData() {
       if (httpRequest.readyState === XMLHttpRequest.DONE) {
         if (httpRequest.status === 200) {
-
           data = JSON.parse(httpRequest.responseText);
-          data['features'].map((e)=>{e['properties']['color'] = perc2color(e['properties']['rank']/51481 * 100)});
+          setColorGradient(dataset_name);
           map.getSource('test').setData(data);
         } else {
           console.log('ERROR' + httpRequest);
@@ -152,11 +193,116 @@
       }
     }
   }
+
+  function setDataProperty(name) {
+    switch (name) {
+      case 'data1':
+        // GCCSA Jobs In Australia - Employed Persons and Duration Adjusted Income 2015-2016
+        property = 'median_income_per_job_aud_persons';
+        break;
+      case 'data2':
+        // GCCSA-P02 Selected Medians and Averages-Census 2016
+        property = 'median_tot_prsnl_inc_weekly';
+        break;
+      case 'data3':
+        // GCCSA-G15 Type of Educational Institute Attending by Sex-Census 2016
+        property = 'tot_p';
+        break;
+      case 'data4':
+        // DJSB Labour Market Data - Employment by Industry GCCSA 2018
+        property = 'empy_by_industry_tot_accom_food';
+        break;
+      case 'data5':
+        // SA2_Jobs_In_Australia_-_Employed_Persons_and_Income_2015-2016
+        property = 'median_income_per_employed_aud_persons';
+        break;
+    }
+  }
+
+  function setLayersAndColors(name) {
+    // based on dataset, set different values for layers
+    switch (name) {
+      case 'data1':
+        layers = ['19223-22163', '21163-25342', '25342-30175', '30175-37700'];
+        colors = ['#D9DAD4', '#D8BEB0', '#D89C8C', '#C07375'];
+        break;
+      case 'data2':
+        layers = ['529-586', '586-638', '638-717', '717-758', '758-1041'];
+        colors = ['#F8F7CD','#F7DDA2', '#F7BE92', '#F09484', '#B9677A'];
+        break;
+      case 'data3':
+        layers = ['1562-159783', '159783-418305', '418305-605065', '605065-790381', '790381-1530174'];
+        colors = ['#F8F7CD','#F7DDA2', '#F7BE92', '#F09484', '#B9677A'];
+        break;
+      case 'data4':
+        layers = ['46500-46500', '75000-75000', '77000-77000', '174900-174900', '185900-185900'];
+        colors = ['#F8F7CD','#F7DDA2', '#F7BE92', '#F09484', '#B9677A'];
+        break;
+      case 'data5':
+        layers = ['0-10', '10-22220', '20-50', '50-100', '100-200', '200-500', '500-1000', '1000+'];
+        colors = ['#FFEDA0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'];
+        break;
+    }
+
+    // remove old legends
+    let legend = document.getElementById('legend');
+    if (length !== undefined) {
+      while (legend.lastElementChild) {
+        legend.removeChild(legend.lastElementChild);
+      }
+    }
+
+    // create new legends
+    for (let i = 0; i < layers.length; i++) {
+      let layer = layers[i];
+      let color = colors[i];
+      let item = document.createElement('div');
+      let key = document.createElement('span');
+
+      key.className = 'legend-key';
+      key.style.backgroundColor = color;
+
+      let value = document.createElement('span');
+      value.innerHTML = layer;
+      item.appendChild(key);
+      item.appendChild(value);
+      legend.appendChild(item);
+    }
+  }
+</script>
+<script>
+  // function to create color gradient
+  function setColorGradient(name) {
+    let maxValue = 0;
+    switch (name) {
+      case 'data1':
+        maxValue = 37700;
+        break;
+      case 'data2':
+        maxValue = 1041;
+        break;
+      case 'data3':
+        maxValue = 1530174;
+        break;
+      case 'data4':
+        maxValue = 185900;
+        break;
+      case 'data5':
+        maxValue = 0;
+        break;
+    }
+    data['features'].map(e => {
+      e['properties']['color'] = colors[Math.floor(e['properties'][property]/maxValue * (colors.length - 1))];
+    });
+  }
 </script>
 <script>
   // get data
-  let dataset_name = 'data';
+  let dataset_name = 'data1';
   let data = null;
+  let property = '';
+  let layers = [];
+  let colors = [];
   selectDataset(dataset_name);
 
   // TO MAKE THE MAP APPEAR YOU MUST
@@ -172,12 +318,8 @@
 
   let hoveredStateId = null;
   map.on('load', function () {
-    // make a pointer cursor
-    // map.getCanvas().style.cursor = 'default';
-    let layers = ['0-10', '10-20', '20-50', '50-100', '100-200', '200-500', '500-1000', '1000+'];
-    let colors = ['#FFEDA0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'];
 
-    data['features'].map((e, i)=>{e['properties']['color'] = perc2color(e['properties']['rank']/51481 * 100)});
+    setColorGradient(dataset_name);
     map.addSource("test", {
       'type': 'geojson',
       'data': data,
@@ -194,7 +336,7 @@
         'fill-opacity': [
           'case',
           ['boolean', ['feature-state', 'hover'], false],
-          1, 0.5]
+          1, 0.7]
       }
     });
 
@@ -209,29 +351,13 @@
       }
     });
 
-    for (i = 0; i < layers.length; i++) {
-      let layer = layers[i];
-      let color = colors[i];
-      let item = document.createElement('div');
-      let key = document.createElement('span');
-
-      key.className = 'legend-key';
-      key.style.backgroundColor = color;
-
-      let value = document.createElement('span');
-      value.innerHTML = layer;
-      item.appendChild(key);
-      item.appendChild(value);
-      legend.appendChild(item);
-    }
-
     map.on('mousemove', function(e) {
       let areas = map.queryRenderedFeatures(e.point, {
         layers: ['data_demo']
       });
 
       if (areas.length > 0) {
-        document.getElementById('pd').innerHTML = '<h3><strong>' + areas[0].properties.rank + '</strong></h3><p><strong><em>' + areas[0].properties.rank + '</strong></em></p>';
+        document.getElementById('pd').innerHTML = '<h3>' + property + '</strong></h3><p><strong><em>' + areas[0].properties[property] + '</strong></em></p>';
       } else {
         document.getElementById('pd').innerHTML = '<p>Hover over an area!</p>';
       }
@@ -264,7 +390,92 @@
     });
   });
 </script>
+<script>
+    let currentMarkers=[];
+    let showMarkers = false;
+  // request coordinates data
+  function requestCoordinates() {
+    showMarkers = !showMarkers;
+    if (showMarkers) {
+      let httpRequest;
+      (function makeRequest() {
+        httpRequest = new XMLHttpRequest();
+        if (!httpRequest) {
+          return false;
+        }
+        httpRequest.onreadystatechange = handleData;
+        // TODO: change to get from backend
+        httpRequest.open('GET', 'data/' + 'test_coordinates.json', true);
+        httpRequest.send();
+      })();
 
+      function handleData() {
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+          if (httpRequest.status === 200) {
+            // create makers
+            addMarkers(formatCoordinates(JSON.parse(httpRequest.responseText)));
+          } else {
+            console.log('ERROR' + httpRequest);
+          }
+        }
+      }
+      document.getElementById('markers').innerHTML = 'hide markers'
+    }
+    else {
+      removeMarkers();
+      document.getElementById('markers').innerHTML = 'show markers'
+    }
+  };
+
+  function formatCoordinates(coordinates_data) {
+    let getjson = {
+      type: 'FeatureCollection',
+      features: []
+    };
+    coordinates_data['rows'].forEach(function (e) {
+      let new_element  = {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: e['key']['location coordinates'][0][0]
+        },
+        properties: {
+          title: '',
+          location_name: e['key']['location name'],
+          value: e['value']
+        }
+      };
+      getjson.features.push(new_element);
+    });
+    return getjson;
+  }
+
+  function addMarkers(markers_data) {
+    // add markers to map
+    markers_data.features.forEach(function(marker) {
+      // create a HTML element for each feature
+      var el = document.createElement('div');
+      el.className = 'marker';
+
+      // make a marker for each feature and add to the map
+      let oneMarker = new mapboxgl.Marker(el)
+          .setLngLat(marker.geometry.coordinates)
+          .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+              .setHTML('<h3>' + marker.properties['location_name'] + '</h3><p>' + marker.properties['value'] + '</p>'))
+          .addTo(map);
+
+      currentMarkers.push(oneMarker);
+    });
+  }
+
+  function removeMarkers() {
+    if (currentMarkers!==null) {
+      for (let i = currentMarkers.length - 1; i >= 0; i--) {
+        currentMarkers[i].remove();
+      }
+    }
+  }
+</script>
 
 </body>
 </html>

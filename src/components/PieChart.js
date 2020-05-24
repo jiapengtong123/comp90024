@@ -9,9 +9,21 @@ export default class PieChart extends Component {
       labels: ['demo1', 'demo2', 'demo3'],
       datasets: [{
         data: [2000, 3000, 4000],
-        backgroundColor: ['#FF0000', '#0000FF', '#FFFF00']
+        // backgroundColor: ['#FF0000', '#0000FF', '#FFFF00']
       }]
     }
+  }
+
+  componentDidMount() {
+    // load data based on different areas
+    let url = 'localhost:80/';
+    fetch('http://example.com/movies.json')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          // format data into chartjs datasets
+
+        });
   }
 
   render() {

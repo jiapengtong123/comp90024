@@ -13,12 +13,12 @@ function App() {
 
   return (
       <div className="App">
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
           <header style={{display: 'block', width: '100%', height: '50px'}}>
             <Button onClick={setScenarios}>Data Graphs</Button>
             <Button href={process.env.PUBLIC_URL + '/choropleth.html'}>Choropleth Map</Button>
           </header>
-          {num === 0 && <div>COMP90024 team54</div>}
+          {num === 0 && <h3>COMP90024 team54</h3>}
           {num === 1 && <Home/>}
         </Container>
       </div>
