@@ -9,6 +9,7 @@ export default class Home extends Component {
       pie_data: {},
       bar_data: {}
     };
+    this.state.loading = true;
   }
 
   componentDidMount() {
@@ -117,7 +118,8 @@ export default class Home extends Component {
                   data: data.city_data['count_employment'],
                   backgroundColor: "#f8ff58",
                 }]
-            }
+            },
+            loading: false
           });
     }).catch((err) => {
       console.log(err);
@@ -126,10 +128,19 @@ export default class Home extends Component {
 
   render() {
     return <div>
-      <div>Pie Chart</div>
-      <PieChart data={this.state.pie_data}/>
-      <div>Bar Chart</div>
-      <BarChart data={this.state.bar_data}/>
+      {
+        !this.state.loading && <>
+          <div>Pie Chart</div>
+          <PieChart data={this.state.pie_data}/>
+          <div>Bar Chart</div>
+          <BarChart data={this.state.bar_data}/>
+        </>
+      }
+      {
+        this.state.loading && <>
+          <h2>Now loading, please wait.</h2>
+        </>
+      }
     </div>
   }
 }
