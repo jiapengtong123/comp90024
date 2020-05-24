@@ -404,8 +404,8 @@
           return false;
         }
         httpRequest.onreadystatechange = handleData;
-        // TODO: change to get from backend
-        httpRequest.open('GET', 'data/' + 'test_coordinates.json', true);
+        // get all locations with count from backend
+        httpRequest.open('GET', '127.0.0.1/fetch/api/v1.0/tasks/precise', true);
         httpRequest.send();
       })();
 
@@ -432,17 +432,17 @@
       type: 'FeatureCollection',
       features: []
     };
-    coordinates_data['rows'].forEach(function (e) {
+    coordinates_data.forEach(function (e) {
       let new_element  = {
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: e['key']['location coordinates'][0][0]
+          coordinates: [e['location coordinates'][1], e['location coordinates'][0]]
         },
         properties: {
           title: '',
-          location_name: e['key']['location name'],
-          value: e['value']
+          location_name: e['location name'],
+          value: e['count']
         }
       };
       getjson.features.push(new_element);

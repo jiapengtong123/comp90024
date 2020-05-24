@@ -5,7 +5,6 @@ import Button from '@material-ui/core/Button';
 
 function Home() {
   const [num, setNum] = useState(1);
-
   return (
       <div>
         <Button onClick={() => setNum(1)}>Scenario 1</Button>
@@ -19,7 +18,7 @@ function Home() {
           <div>Pie Chart</div>
           <PieChart/>
           <div>Bar Chart</div>
-          <BarChart/>
+          <BarChart scenario={1}/>
         </div>
         }
 
