@@ -19,7 +19,14 @@ export default class Home extends Component {
       '127.0.0.1/fetch/api/v1.0/tasks/employment'
     ];
 
-    let promises = urls.map(url => fetch(url).then(y => y.json()));
+    let promises = urls.map(url => fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "text/plain"
+      },
+    }).then(y => {
+      return y.json()
+    }));
     Promise.all(promises).then(([corona_data, economy_data, employment_data]) => {
       const corona = corona_data;
       const economy = economy_data;
