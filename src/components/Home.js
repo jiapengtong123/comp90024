@@ -14,9 +14,9 @@ export default class Home extends Component {
 
   componentDidMount() {
     const urls = [
-      '127.0.0.1/fetch/api/v1.0/tasks/corona',
-      '127.0.0.1/fetch/api/v1.0/tasks/economy',
-      '127.0.0.1/fetch/api/v1.0/tasks/employment'
+      'http://172.26.129.249:80/fetch/api/v1.0/tasks/corona',
+      'http://172.26.129.249:80/fetch/api/v1.0/tasks/economy',
+      'http://172.26.129.249:80/fetch/api/v1.0/tasks/employment'
     ];
 
     let promises = urls.map(url => fetch(url, {
@@ -34,6 +34,9 @@ export default class Home extends Component {
       // count up all data into one
       let city_names = [];
       let city_data = [...corona];
+      let city_corona = [];
+      let city_economy = [];
+      let city_employment = [];
       let corona_countup = 0;
       let economy_countup = 0;
       let employment_countup = 0;
@@ -56,7 +59,7 @@ export default class Home extends Component {
       // combine three datasets as one, for each city
       city_data.map(e1 => {
         economy.map(e2 => {
-          if (e1['location name'] === e2['location name']) {
+          if (e1['location'] === e2['location']) {
             e1['count_economy'] = e2['count'];
           }
           return e2;
@@ -66,7 +69,7 @@ export default class Home extends Component {
 
       city_data.map(e1 => {
         employment.map(e2 => {
-          if (e1['location name'] === e2['location name']) {
+          if (e1['location'] === e2['location']) {
             e1['count_employment'] = e2['count'];
           }
           return e2;
@@ -74,15 +77,22 @@ export default class Home extends Component {
         return e1
       });
 
+      console.log(city_data);
+
       // get city names in a list
       city_data.map(e => {
-        city_names.push(e['location name']);
+        city_names.push(e['location']);
+        city_corona.push(e['count']);
+        city_economy.push(e['count_economy']);
+        city_employment.push(e['count_employment']);
         return e;
       });
 
       return {
         city_names: city_names,
-        city_data: city_data,
+        city_corona: city_corona,
+        city_economy: city_economy,
+        city_employment: city_employment,
         corona_countup: corona_countup,
         economy_countup: economy_countup,
         employment_countup: employment_countup
@@ -92,40 +102,27 @@ export default class Home extends Component {
           {
             pie_data: {
               labels: ['corona', 'economy', 'employment'],
-              datasets: [
-                {
-                  label: 'corona',
-                  data: data.corona_countup,
-                  backgroundColor: '#4ca1ff',
-                },
-                {
-                  label: "economy",
-                  data: data.economy_countup,
-                  backgroundColor: "#ff7474",
-                },
-                {
-                  label: "employment",
-                  data: data.employment_countup,
-                  backgroundColor: "#f8ff58",
-                }
-              ]
+              datasets: [{
+                data: [data.corona_countup, data.economy_countup, data.employment_countup],
+                backgroundColor: ['#4ca1ff', "#ff7474", "#f8ff58"]
+              }]
             },
             bar_data: {
               labels: data.city_names,
               datasets: [
                 {
                   label: 'corona',
-                  data: data.city_data['count'],
+                  data: data.city_corona,
                   backgroundColor: '#4ca1ff',
                 },
                 {
                   label: "economy",
-                  data: data.city_data['count_economy'],
+                  data: data.city_economy,
                   backgroundColor: "#ff7474",
                 },
                 {
                   label: "employment",
-                  data: data.city_data['count_employment'],
+                  data: data.city_employment,
                   backgroundColor: "#f8ff58",
                 }]
             },

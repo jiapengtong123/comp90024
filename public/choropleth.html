@@ -409,7 +409,7 @@
         httpRequest.withCredentials = true;
         httpRequest.onreadystatechange = handleData;
         // get all locations with count from backend
-        httpRequest.open('GET', '127.0.0.1/fetch/api/v1.0/tasks/precise', true);
+        httpRequest.open('GET', '172.26.129.249/fetch/api/v1.0/tasks/precise', true);
         httpRequest.send();
       })();
 
