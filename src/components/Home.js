@@ -29,14 +29,17 @@ export default class Home extends Component {
 
       corona.map(e => {
         corona_countup += e['count'];
+        return e;
       });
 
       economy.map(e => {
         economy_countup += e['count'];
+        return e;
       });
 
       employment.map(e => {
         employment_countup += e['count'];
+        return e;
       });
 
       // combine three datasets as one, for each city
