@@ -13,14 +13,17 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    Promise.all([
-      fetch('127.0.0.1/fetch/api/v1.0/tasks/corona'),
-      fetch('127.0.0.1/fetch/api/v1.0/tasks/economy'),
-      fetch('127.0.0.1/fetch/api/v1.0/tasks/employment'),
-    ]).then(async ([corona_data, economy_data, employment_data]) => {
-      const corona = await corona_data.json();
-      const economy = await economy_data.json();
-      const employment = await employment_data.json();
+    const urls = [
+      '127.0.0.1/fetch/api/v1.0/tasks/corona',
+      '127.0.0.1/fetch/api/v1.0/tasks/economy',
+      '127.0.0.1/fetch/api/v1.0/tasks/employment'
+    ];
+
+    let promises = urls.map(url => fetch(url).then(y => y.json()));
+    Promise.all(promises).then(([corona_data, economy_data, employment_data]) => {
+      const corona = corona_data;
+      const economy = economy_data;
+      const employment = employment_data;
       // count up all data into one
       let city_names = [];
       let city_data = [...corona];
@@ -121,8 +124,6 @@ export default class Home extends Component {
             },
             loading: false
           });
-    }).catch((err) => {
-      console.log(err);
     });
   }
 
