@@ -47,7 +47,7 @@ const StyledFeature = styled.div`
   font-family: Arial, sans-serif;
   overflow: auto;
   border-radius: 3px;
-  top: 120px;
+  top: 150px;
   height: 200px;
   margin-top: 20px;
   width: 250px;
@@ -247,7 +247,7 @@ export default class ChoroplethMap extends Component {
   render() {
     return (
         <>
-          <h3><span>{this.state.datasets[this.state.dataset_name]['property_good_name']}</span>
+          <h3><span>{this.state.datasets[this.state.dataset_name]['property_good_name']} in </span>
             {this.state.datasets[this.state.dataset_name]['name']}</h3>
           <Select value={this.state.selected} onChange={this.handleChange}>
             {this.renderOptions()}
