@@ -47,7 +47,7 @@ const StyledFeature = styled.div`
   font-family: Arial, sans-serif;
   overflow: auto;
   border-radius: 3px;
-  top: 75px;
+  top: 100px;
   height: 200px;
   margin-top: 20px;
   width: 250px;
@@ -108,35 +108,48 @@ export default class ChoroplethMap extends Component {
     this.state.data = data1;
     this.state.dataset_name = 'data1';
     this.state.datasets = {
+      // GCCSA Jobs In Australia - Employed Persons and Duration Adjusted Income 2015-2016
       data1: {
+        name: 'GCCSA Jobs In Australia - Employed Persons and Duration Adjusted Income 2015-2016',
         layers: ['19223-22163', '21163-25342', '25342-30175', '30175-37700'],
         colors: ['#D9DAD4', '#D8BEB0', '#D89C8C', '#C07375'],
         maxValue: 37700,
-        property: 'median_income_per_job_aud_persons'
+        property: 'median_income_per_job_aud_persons',
+        property_good_name: 'median income per job for a person'
       },
+      // GCCSA-P02 Selected Medians and Averages-Census 2016
       data2: {
+        name: 'GCCSA-P02 Selected Medians and Averages-Census 2016',
         layers: ['529-586', '586-638', '638-717', '717-758', '758-1041'],
         colors: ['#F8F7CD', '#F7DDA2', '#F7BE92', '#F09484', '#B9677A'],
         maxValue: 1041,
-        property: 'median_tot_prsnl_inc_weekly'
+        property: 'median_tot_prsnl_inc_weekly',
+        property_good_name: 'median total personal income of a person weekly'
       },
+      // GCCSA-G15 Type of Educational Institute Attending by Sex-Census 2016
       data3: {
+        name: 'GCCSA-G15 Type of Educational Institute Attending by Sex-Census 2016',
         layers: ['1562-159783', '159783-418305', '418305-605065', '605065-790381', '790381-1530174'],
         colors: ['#F8F7CD', '#F7DDA2', '#F7BE92', '#F09484', '#B9677A'],
         maxValue: 1530174,
-        property: 'tot_p'
+        property: 'tot_p',
+        property_good_name: 'total number of students'
       },
+      // DJSB Labour Market Data - Employment by Industry GCCSA 2018
       data4: {
+        name: 'DJSB Labour Market Data - Employment by Industry GCCSA 2018',
         layers: ['46500-46500', '75000-75000', '77000-77000', '174900-174900', '185900-185900'],
         colors: ['#F8F7CD', '#F7DDA2', '#F7BE92', '#F09484', '#B9677A'],
         maxValue: 185900,
-        property: 'empy_by_industry_tot_accom_food'
+        property: 'empy_by_industry_tot_accom_food',
+        property_good_name: 'number of person in accommodation and food services'
       },
       data5: {
         layers: ['0-10', '10-22220', '20-50', '50-100', '100-200', '200-500', '500-1000', '1000+'],
         colors: ['#FFEDA0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'],
         maxValue: 0,
-        property: 'median_income_per_employed_aud_persons'
+        property: 'median_income_per_employed_aud_persons',
+        property_good_name: ''
       }
     };
     this.state.center = [133.7751, -25.2744];
@@ -169,6 +182,10 @@ export default class ChoroplethMap extends Component {
     return this.state.datasets[name]['property'];
   }
 
+  getPropertyGoodName(name) {
+    return this.state.datasets[name]['property_good_name'];
+  }
+
   handleChange = event => {
     this.setState({dataset_name: event.target.value});
     this.setState({currentLayer: {}});
@@ -179,12 +196,12 @@ export default class ChoroplethMap extends Component {
       case 'data2':
         this.setState({data: data2});
         break;
-        case 'data3':
-          this.setState({data: data3});
-          break;
-        case 'data4':
-          this.setState({data: data4});
-          break;
+      case 'data3':
+        this.setState({data: data3});
+        break;
+      case 'data4':
+        this.setState({data: data4});
+        break;
         // case 'data5':
         //   this.setState({data: data5});
         //   break;
@@ -221,7 +238,7 @@ export default class ChoroplethMap extends Component {
   handleLayer = (layer) => {
     this.setState({
       currentLayer: {
-        name: this.getPropertyName(this.state.dataset_name),
+        name: this.getPropertyGoodName(this.state.dataset_name),
         value: layer['properties'][this.getPropertyName(this.state.dataset_name)]
       }
     });
@@ -230,6 +247,7 @@ export default class ChoroplethMap extends Component {
   render() {
     return (
         <>
+          <h3>{this.state.datasets[this.state.dataset_name]['name']}</h3>
           <Select value={this.state.selected} onChange={this.handleChange}>
             {this.renderOptions()}
           </Select>
@@ -284,7 +302,7 @@ export default class ChoroplethMap extends Component {
               }
             </Layer>
             }
-            {this.state.selectedMarker && (
+            {this.state.selectedMarker && this.state.showMarker && (
                 <Popup key={this.state.selectedMarker['location name']}
                        coordinates={[this.state.selectedMarker['location coordinates'][1], this.state.selectedMarker['location coordinates'][0]]}>
                   <StyledPopup>
