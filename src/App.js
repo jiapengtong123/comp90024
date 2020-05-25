@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import Home from './components/Home';
 import Container from '@material-ui/core/Container';
@@ -8,6 +8,11 @@ import Map from './components/Map';
 
 function App() {
   const [num, setNum] = useState(0);
+  const [ip, setIP] = useState('');
+
+  useEffect(() => {
+    setIP(window.location.href);
+  }, []);
 
   const setScenarios = () => {
     setNum(1);
@@ -27,8 +32,8 @@ function App() {
           </header>
           </Container>
           {num === 0 && <h3>COMP90024 team54</h3>}
-          {num === 1 && <Home/>}
-          {num === 2 && <Map/>}
+          {num === 1 && <Home IP={ip}/>}
+          {num === 2 && <Map IP={ip}/>}
       </div>
   );
 }
