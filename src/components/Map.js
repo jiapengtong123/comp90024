@@ -121,7 +121,7 @@ export default class ChoroplethMap extends Component {
       data2: {
         name: 'GCCSA-P02 Selected Medians and Averages-Census 2016',
         layers: ['529-586', '586-638', '638-717', '717-758', '758-1041'],
-        colors: ['#F8F7CD', '#F7DDA2', '#F7BE92', '#F09484', '#B9677A'],
+        colors: ['#CFF1DD', '#9FE3BB', '#6CD599', '#3CC776', '#32A964'],
         maxValue: 1041,
         property: 'median_tot_prsnl_inc_weekly',
         property_good_name: 'median total personal income of a person weekly'
@@ -130,7 +130,7 @@ export default class ChoroplethMap extends Component {
       data3: {
         name: 'GCCSA-G15 Type of Educational Institute Attending by Sex-Census 2016',
         layers: ['1562-159783', '159783-418305', '418305-605065', '605065-790381', '790381-1530174'],
-        colors: ['#F8F7CD', '#F7DDA2', '#F7BE92', '#F09484', '#B9677A'],
+        colors: ['#7FCDBB', '#41B6C4', '#1D91C0', '#225EA8', '#0C2C84'],
         maxValue: 1530174,
         property: 'tot_p',
         property_good_name: 'total number of students'
@@ -139,18 +139,18 @@ export default class ChoroplethMap extends Component {
       data4: {
         name: 'DJSB Labour Market Data - Employment by Industry GCCSA 2018',
         layers: ['46500-46500', '75000-75000', '77000-77000', '174900-174900', '185900-185900'],
-        colors: ['#F8F7CD', '#F7DDA2', '#F7BE92', '#F09484', '#B9677A'],
+        colors: ['#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#B10026'],
         maxValue: 185900,
         property: 'empy_by_industry_tot_accom_food',
         property_good_name: 'number of person in accommodation and food services'
       },
-      data5: {
-        layers: ['0-10', '10-22220', '20-50', '50-100', '100-200', '200-500', '500-1000', '1000+'],
-        colors: ['#FFEDA0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'],
-        maxValue: 0,
-        property: 'median_income_per_employed_aud_persons',
-        property_good_name: ''
-      }
+      // data5: {
+      //   layers: ['0-10', '10-22220', '20-50', '50-100', '100-200', '200-500', '500-1000', '1000+'],
+      //   colors: ['#FFEDA0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'],
+      //   maxValue: 0,
+      //   property: 'median_income_per_employed_aud_persons',
+      //   property_good_name: ''
+      // }
     };
     this.state.center = [133.7751, -25.2744];
     this.state.zoom = [3.5];
@@ -209,10 +209,10 @@ export default class ChoroplethMap extends Component {
   };
 
   renderOptions() {
-    return ['data1', 'data2', 'data3', 'data4', 'data5'].map((e, i) => {
+    return ['data1', 'data2', 'data3', 'data4'].map((e, i) => {
       return (
           <MenuItem
-              label="Select a country"
+              label="Select a dataset"
               value={e}
               key={i}>{e}</MenuItem>
       );
