@@ -25,7 +25,7 @@ export default class BarChart extends Component {
                   }]
                 }
               }}
-              height={1000}
+              height={500}
           />
         </div>
     )
