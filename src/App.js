@@ -11,7 +11,7 @@ function App() {
   const [ip, setIP] = useState('');
 
   useEffect(() => {
-    setIP(window.location.href);
+    setIP(window.location.href.split(':')[0] + ":" + window.location.href.split(':')[1]);
   }, []);
 
   const setScenarios = () => {
@@ -30,10 +30,10 @@ function App() {
             {/*<Button href={process.env.PUBLIC_URL + '/choropleth.html'}>Choropleth Map</Button>*/}
             <Button onClick={setMap}>Choropleth Map</Button>
           </header>
-          </Container>
-          {num === 0 && <h3>COMP90024 team54</h3>}
-          {num === 1 && <Home IP={ip}/>}
-          {num === 2 && <Map IP={ip}/>}
+        </Container>
+        {num === 0 && <h3>COMP90024 team54</h3>}
+        {num === 1 && <Home IP={ip}/>}
+        {num === 2 && <Map IP={ip}/>}
       </div>
   );
 }

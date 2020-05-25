@@ -14,11 +14,11 @@ export default class Home extends Component {
 
   componentDidMount() {
     const ip = this.props.IP;
-    //http://172.26.129.249:80/
+    //http://172.26.129.249:80
     const urls = [
-        ip + 'fetch/api/v1.0/tasks/corona',
-        ip + 'fetch/api/v1.0/tasks/economy',
-        ip + 'fetch/api/v1.0/tasks/employment'
+        ip + '/fetch/api/v1.0/tasks/corona',
+        ip + '/fetch/api/v1.0/tasks/economy',
+        ip + '/fetch/api/v1.0/tasks/employment'
     ];
 
     let promises = urls.map(url => fetch(url, {

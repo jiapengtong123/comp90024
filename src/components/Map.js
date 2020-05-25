@@ -148,7 +148,7 @@ export default class ChoroplethMap extends Component {
 
   componentDidMount() {
     const ip = this.props.IP;
-    const url = ip + 'fetch/api/v1.0/tasks/precise';
+    const url = ip + '/fetch/api/v1.0/tasks/precise';
     fetch(url).then(response => response.json()).then(
         data => {
           this.setState({markers: data});
